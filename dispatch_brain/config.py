@@ -12,6 +12,42 @@ from pathlib import Path
 import yaml
 
 
+def load_dotenv(path: Path | None = None) -> None:
+    """Minimal stdlib .env loader.
+
+    Looks for `.env` in the current directory, then in the project root
+    (parent of config/). Existing environment variables always win, so
+    real shell exports / CI secrets are never shadowed by the file.
+    """
+    candidates = []
+    if path is not None:
+        candidates = [path]
+    else:
+        candidates = [
+            Path.cwd() / ".env",
+            Path(__file__).resolve().parent.parent / ".env",
+        ]
+    for candidate in candidates:
+        try:
+            if not candidate.is_file():
+                continue
+            for line in candidate.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, _, value = line.partition("=")
+                key = key.strip()
+                value = value.strip().strip('"').strip("'")
+                if key and key not in os.environ:
+                    os.environ[key] = value
+            return
+        except OSError:
+            continue
+
+
+load_dotenv()
+
+
 def config_dir() -> Path:
     env = os.environ.get("DISPATCH_BRAIN_CONFIG")
     if env:

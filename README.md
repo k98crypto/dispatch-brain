@@ -70,7 +70,8 @@ dispatch-brain serve --port 8787
 - Base URL 填 `http://127.0.0.1:8787/v1`
 - 模型名填 `auto`（或固定档位 `auto-cheap` / `auto-strong` / `auto-vision`）
 
-dsh、Cua、OpenAI SDK 的具体接法见 [examples/integrations.md](examples/integrations.md)。
+dsh、Cua、OpenAI SDK 的具体接法见 [examples/integrations.md](examples/integrations.md)；
+完整的中文安装与日常使用手册见 [docs/USAGE_zh.md](docs/USAGE_zh.md)。
 
 不用起服务也能先看它怎么决策：
 
