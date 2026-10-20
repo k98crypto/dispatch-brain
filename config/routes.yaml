@@ -1,0 +1,80 @@
+# Routing table — the "brain" you can read and hand-edit.
+#
+# For each scene, each difficulty tier picks: model + fallback chain +
+# reasoning level + token cap. The gateway enforces the caps; the
+# watchdog enforces steps/time at the agent-runtime level.
+#
+# Philosophy (see README): deterministic work spends zero LLM tokens;
+# simple work goes to the cheap model with reasoning low/off; only
+# genuinely hard work pays for the strong model; vision always goes to
+# a vision model — a text-only model cannot be "patched" into seeing.
+
+defaults:
+  max_tokens: 8000
+  max_steps: 40
+  max_seconds: 900
+
+# Pinned virtual models a client can request directly.
+pins:
+  auto-cheap:
+    model: deepseek-flash
+    reasoning: low
+    max_tokens: 4000
+    fallbacks: [qwen-local]
+  auto-strong:
+    model: deepseek-v4-pro
+    reasoning: high
+    max_tokens: 16000
+    fallbacks: [deepseek-flash]
+  auto-vision:
+    model: qwen-vl-max
+    reasoning: medium
+    max_tokens: 8000
+    vision: true
+    fallbacks: []
+
+scenes:
+  deterministic:
+    # executor: script — the gateway refuses to spend LLM tokens here.
+    simple:   { executor: script, model: null }
+    standard: { executor: script, model: null }
+    hard:     { executor: script, model: null }
+
+  vision:
+    simple:   { model: qwen-vl-max, reasoning: low,    max_tokens: 4000,  fallbacks: [] }
+    standard: { model: qwen-vl-max, reasoning: medium, max_tokens: 8000,  fallbacks: [] }
+    hard:     { model: qwen-vl-max, reasoning: high,   max_tokens: 12000, fallbacks: [] }
+
+  gui:
+    # GUI / computer-use tasks: executed by a computer-use agent
+    # (e.g. a Cua-based one) whose eyes are the vision model.
+    simple:   { model: qwen-vl-max, reasoning: low,    max_tokens: 6000,  max_steps: 25, fallbacks: [] }
+    standard: { model: qwen-vl-max, reasoning: medium, max_tokens: 8000,  max_steps: 40, fallbacks: [] }
+    hard:     { model: qwen-vl-max, reasoning: high,   max_tokens: 12000, max_steps: 60, fallbacks: [] }
+
+  code:
+    simple:   { model: deepseek-flash, reasoning: low,    max_tokens: 4000,  fallbacks: [deepseek-v4-pro] }
+    standard: { model: deepseek-flash, reasoning: medium, max_tokens: 8000,  fallbacks: [deepseek-v4-pro] }
+    hard:     { model: deepseek-v4-pro, reasoning: high,  max_tokens: 16000, fallbacks: [deepseek-flash] }
+
+  file_ops:
+    simple:   { model: deepseek-flash, reasoning: low,    max_tokens: 4000, fallbacks: [qwen-local] }
+    standard: { model: deepseek-flash, reasoning: medium, max_tokens: 8000, fallbacks: [deepseek-v4-pro] }
+    hard:     { model: deepseek-v4-pro, reasoning: high,   max_tokens: 12000, fallbacks: [deepseek-flash] }
+
+  data:
+    simple:   { model: deepseek-flash, reasoning: low,    max_tokens: 4000,  fallbacks: [deepseek-v4-pro] }
+    standard: { model: deepseek-flash, reasoning: medium, max_tokens: 8000,  fallbacks: [deepseek-v4-pro] }
+    hard:     { model: deepseek-v4-pro, reasoning: high,   max_tokens: 16000, fallbacks: [deepseek-flash] }
+
+  writing:
+    simple:   { model: deepseek-flash, reasoning: low,    max_tokens: 4000,  fallbacks: [deepseek-v4-pro] }
+    standard: { model: deepseek-flash, reasoning: medium, max_tokens: 8000,  fallbacks: [deepseek-v4-pro] }
+    # Open-ended writing has no objective checker, so hard writing pays
+    # for the strong model instead of pretending a cheap one verified OK.
+    hard:     { model: deepseek-v4-pro, reasoning: high,   max_tokens: 16000, fallbacks: [deepseek-flash] }
+
+  chat:
+    simple:   { model: deepseek-flash, reasoning: low,    max_tokens: 3000,  fallbacks: [qwen-local] }
+    standard: { model: deepseek-flash, reasoning: medium, max_tokens: 6000,  fallbacks: [deepseek-v4-pro] }
+    hard:     { model: deepseek-v4-pro, reasoning: high,   max_tokens: 12000, fallbacks: [deepseek-flash] }

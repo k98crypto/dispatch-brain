@@ -1,0 +1,5 @@
+fastapi>=0.110
+uvicorn>=0.29
+httpx>=0.27
+pyyaml>=6.0
+# Optional (not required for V1): litellm==1.80.0  # pinned, see README security notes

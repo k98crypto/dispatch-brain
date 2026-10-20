@@ -1,0 +1,49 @@
+# Model registry.
+#
+# RULE: API keys never live in this file. `api_key_env` names the
+# environment variable that holds the key. Prices are indicative
+# snapshots for cost intuition only — always check the provider's
+# current pricing page before budgeting on them.
+
+models:
+  deepseek-flash:
+    provider: deepseek
+    model: deepseek-flash            # DeepSeek V4.1-Flash line (text only)
+    base_url: https://api.deepseek.com/v1
+    api_key_env: DEEPSEEK_API_KEY
+    vision: false
+    tier: cheap
+
+  deepseek-v4-pro:
+    provider: deepseek
+    model: deepseek-v4-pro
+    base_url: https://api.deepseek.com/v1
+    api_key_env: DEEPSEEK_API_KEY
+    vision: false
+    tier: strong
+
+  qwen-vl-max:
+    provider: dashscope              # Alibaba Cloud DashScope, OpenAI-compatible mode
+    model: qwen-vl-max
+    base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+    api_key_env: DASHSCOPE_API_KEY
+    vision: true
+    tier: vision
+
+  qwen-local:
+    provider: custom                 # your own OpenAI-compatible endpoint
+    model: qwen3:4b                  # e.g. Ollama on a home server
+    base_url: http://127.0.0.1:11434/v1
+    base_url_env: LOCAL_LLM_BASE_URL # env override wins when set
+    api_key_env: LOCAL_LLM_API_KEY   # may stay empty for keyless local servers
+    vision: false
+    tier: local
+
+  # --- examples (uncomment and fill env vars to enable) -------------------
+  # claude-sonnet:
+  #   provider: anthropic
+  #   model: claude-sonnet-4-5
+  #   base_url: https://api.anthropic.com/v1   # note: Anthropic needs an
+  #   api_key_env: ANTHROPIC_API_KEY           # OpenAI-compatible endpoint
+  #   vision: true                             # or the LiteLLM engine
+  #   tier: strong

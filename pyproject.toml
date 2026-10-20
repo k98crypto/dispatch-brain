@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dispatch-brain"
+version = "0.1.0"
+description = "A self-learning dispatch brain for LLM agents: classify tasks, route to the right model, and stop runaway token burn."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "k98crypto" }]
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "httpx>=0.27",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+# Optional: use LiteLLM as the upstream-calling engine instead of the
+# built-in httpx forwarder. Pin the version: LiteLLM suffered a PyPI
+# supply-chain incident in March 2026; only install verified releases.
+litellm = ["litellm==1.80.0"]
+
+[project.scripts]
+dispatch-brain = "dispatch_brain.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["dispatch_brain*"]

@@ -1,0 +1,43 @@
+# OPTIONAL alternative: run LiteLLM's own proxy as the gateway engine
+# instead of DispatchBrain's built-in forwarder.
+#
+# LiteLLM — https://github.com/BerriAI/litellm — MIT License.
+# Used here purely as an installed dependency / external process;
+# no LiteLLM code is copied into this repository.
+#
+# When to prefer this: you want LiteLLM's provider coverage (100+),
+# virtual-key management and spend tracking. You still keep
+# DispatchBrain in front for classification + watchdog + task logs,
+# OR you use these static aliases directly without auto-routing.
+#
+# Pin the version (supply-chain incident on PyPI in March 2026):
+#   pip install "litellm[proxy]==1.80.0"
+#   litellm --config config/litellm_config.yaml --port 4000
+
+model_list:
+  - model_name: brain-cheap
+    litellm_params:
+      model: deepseek/deepseek-flash
+      api_key: os.environ/DEEPSEEK_API_KEY
+  - model_name: brain-strong
+    litellm_params:
+      model: deepseek/deepseek-v4-pro
+      api_key: os.environ/DEEPSEEK_API_KEY
+  - model_name: brain-vision
+    litellm_params:
+      model: dashscope/qwen-vl-max
+      api_key: os.environ/DASHSCOPE_API_KEY
+  - model_name: brain-local
+    litellm_params:
+      model: openai/qwen3:4b
+      api_base: os.environ/LOCAL_LLM_BASE_URL
+      api_key: os.environ/LOCAL_LLM_API_KEY
+
+router_settings:
+  fallbacks:
+    - brain-cheap: ["brain-strong"]
+    - brain-strong: ["brain-cheap"]
+
+general_settings:
+  # Set your own master key via env LITELLM_MASTER_KEY in production.
+  master_key: os.environ/LITELLM_MASTER_KEY
