@@ -14,4 +14,4 @@ inspired the design are credited in README.md and in module docstrings;
 none of their code is copied.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
